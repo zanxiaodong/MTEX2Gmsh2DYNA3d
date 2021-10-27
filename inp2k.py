@@ -1,19 +1,20 @@
 import pandas as pd
 import csv
+import sys
 
 """
 Input dir
     Please specify it every time
 """
-inp_dir = r"./twins.inp"
-euler_dir = r'C:\Users\Gary\Desktop\polycrystalline modelling\MTEX2Gmsh\euler.csv'
+inp_dir = r"./du.inp"
+euler_dir = r'./du_euler.csv'
 
 """
 Output dir
     Please specify it every time
 """
-euler_angle_dir = r'.\Euler_angle.csv'
-kfile_dir = r'.\EBSD_mesh.k'
+euler_angle_dir = r'.\Euler_angle_du.csv'
+kfile_dir = r'.\EBSD_mesh_du.k'
 
 
 """
@@ -146,6 +147,9 @@ elem_num = len(elem_df.index)
 grain_num = len(grain_df.index)
 grain_num_ebsd = len(euler_df)
 print(f"successfully reading this file, with {grain_num} grains, {elem_num} elements, {node_num} nodes")
+
+if grain_num_ebsd!=grain_num:
+    sys.exit("grain num is not match in .csv and .inp")
 
 """
 Write .k grain
