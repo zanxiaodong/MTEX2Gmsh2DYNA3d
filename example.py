@@ -1,3 +1,9 @@
+"""
+This is the example to use our library
+Author: CHEN Jiawei, master student
+        Materials forming and processing Lab
+        The University of Tokyo
+"""
 import eulerangle
 import inp2k
 import pandas as pd
@@ -15,14 +21,10 @@ euler_df = eulerangle.read_euler(euler_dir)
 
 #reordering
 node_df,elem_df = inp2k.reordering(node_df,elem_df)
-
 node3d_df, elem3d_df, elemgrain3d_df, grain3d_df = inp2k.kPacking(5,0.1,node_df,elem_df,elemgrain_df,grain_df)
 
-#print(elemgrain3d_df)
-
-# reordering the elem3d, elemgrain3d, grain3d
 
 # output the required mesh file and euler angle file
 inp2k.write_mesh(node3d_df,elem3d_df, grain3d_df, euler_df, elemgrain3d_df)
 #inp2k.write_mesh(node_df,elem_df, grain_df, euler_df, elemgrain_df)
-#eulerangle.write_euler(euler_df)
+eulerangle.write_euler(euler_df)
