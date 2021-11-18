@@ -19,6 +19,7 @@ def read_node(inp_dir):
     # ----------------------------------------
     node_info_columns = ["id", "x", "y", "z"]
     node_df = pd.DataFrame(columns=node_info_columns)
+    print("reading node info.")
     with open(inp_dir, 'r') as inp:
         line = inp.readline()
         node_area_flag = False
@@ -32,9 +33,10 @@ def read_node(inp_dir):
                 info = line.replace(" ", "").replace("\n", "").split(',')
                 node_df = node_df.append(dict(zip(node_df.columns, [info[0], info[1], info[2], info[3]])),
                                          ignore_index=True)
-                print(f"reading {info[0]} node info")
+                #print(f"reading {info[0]} node info")
             line = inp.readline()
         inp.close()
+    print("finish reading node info.")
     return node_df
 
 
@@ -50,7 +52,7 @@ def read_element(inp_dir):
     # ----------------------------------------
     elem_info_columns = ["id", "nodes"]
     elem_df = pd.DataFrame(columns=elem_info_columns)
-
+    print("reading elem info.")
     with open(inp_dir, 'r') as inp:
         line = inp.readline()
         elem_area_flag = False
@@ -63,12 +65,13 @@ def read_element(inp_dir):
                     info = line.replace(" ", "").replace("\n", "").split(',')
                     elem_df = elem_df.append(dict(zip(elem_df.columns, [info[0], info[1:]])),
                                              ignore_index=True)
-                    print(f"reading {info[0]} elem info")
+                    #print(f"reading {info[0]} elem info")
                     id = id + 1
             if line.startswith('*ELSET,ELSET=Grain_1'):
                 break
             line = inp.readline()
         inp.close()
+    print("finish reading elem info.")
     return elem_df
 
 
@@ -85,6 +88,7 @@ def read_grain(inp_dir,num_elem):
     grain_info_columns = ["id", "elements"]
     grain_df = pd.DataFrame(columns=grain_info_columns)
     max_elemid = num_elem
+    print("reading grain info.")
     with open(inp_dir, 'r') as inp:
         line = inp.readline()
         grain_area_flag = False
@@ -99,7 +103,7 @@ def read_grain(inp_dir,num_elem):
                 if line.endswith(f"*ELSET,ELSET=Grain_{id + 1}\n"):
                     grain_df = grain_df.append(dict(zip(grain_df.columns, [id, vec]))
                                                , ignore_index=True)
-                    print(f"reading {id} grain info")
+                    #print(f"reading {id} grain info")
                     vec = []
                     id = id + 1
                     line = inp.readline()
@@ -113,7 +117,7 @@ def read_grain(inp_dir,num_elem):
 
             line = inp.readline()
         inp.close()
-
+    print("finish reading grain info.")
     return grain_df
 
 
@@ -131,14 +135,15 @@ def read_elemgrain(grain_df):
     # ----------------------------------------
     elemgrain_df_info_columns = ["elementid", "grainid"]
     elemgrain_df = pd.DataFrame(columns=elemgrain_df_info_columns)
-
+    print("reading elemgrain info.")
     for i in range(len(grain_df)):
         vec = grain_df.iloc[i]['elements']
         grainid = grain_df.iloc[i]['id']
         for ii in range(len(vec)):
             elemgrain_df = elemgrain_df.append(dict(zip(elemgrain_df.columns, [vec[ii], grainid]))
                                                , ignore_index=True)
-            print(f'finding grain for element{vec[ii]}')
+            #print(f'finding grain for element{vec[ii]}')
+    print("finish reading elemgrain info.")
     return elemgrain_df
 
 
@@ -173,10 +178,11 @@ def write_mesh(node_df,elem_df,grain_df,euler_df,elemgrain_df):
     Write .k grain
         grain_info_columns = ["id", "elements"]
     """
+    print("writing grain info into .k")
     with open(kfile_dir, 'w') as k:
         for i in range(len(grain_df)):
             pid = grain_df.iloc[i]["id"]
-            print(f"writing {pid} grain info into .k")
+            #print(f"writing {pid} grain info into .k")
             k.write("*PART\n")
             k.write("$#                                                                         title\n")
             k.write(f"boxsolid_{pid}\n")
@@ -205,14 +211,14 @@ def write_mesh(node_df,elem_df,grain_df,euler_df,elemgrain_df):
             elem_info_columns = ["id", "nodes"]
             elemgrain_df_info_columns = ["elementid","grainid"]
         """
+        print("writing elem info into .k")
         k.write("*ELEMENT_SOLID\n")
         k.write("$#   eid     pid      n1      n2      n3      n4      n5      n6      n7      n8\n")
         for i in range(elem_num):
-            print(f"writing {elem_df.iloc[i]['id']} elem info into .k")
+            #print(f"writing {elem_df.iloc[i]['id']} elem info into .k")
             k.write(f"{elem_df.iloc[i]['id']}".rjust(8))
 
             pos = elemgrain_df[elemgrain_df.elementid == elem_df.iloc[i]['id']].index.tolist()[0]
-            print(pos)
             k.write(f"{elemgrain_df.iloc[pos]['grainid']}".rjust(8))
 
             for nodeid in range(len(elem_df.iloc[i]['nodes'])):
@@ -233,7 +239,7 @@ def write_mesh(node_df,elem_df,grain_df,euler_df,elemgrain_df):
             y = '%s' % float('%.6g' % float(y))
             z = node_df.iloc[i]['z']
             z = '%s' % float('%.5g' % float(z))
-            print(f"writing {node_df.iloc[i]['id']} node into .k")
+            #print(f"writing {node_df.iloc[i]['id']} node into .k")
 
             k.write(f"{id}".rjust(8))
             k.write(f"{x}".rjust(16))
@@ -243,6 +249,9 @@ def write_mesh(node_df,elem_df,grain_df,euler_df,elemgrain_df):
             k.write("       0")
             k.write('\n')
         k.close()
+        print("finish writing meshes into .k.")
+
+
 
 def reordering(node_df,elem_df):
     # ----------------------------------------
@@ -253,8 +262,8 @@ def reordering(node_df,elem_df):
     #   Input:      Dataframe node_df, col = ["id", "nodes"]
     #               Dataframe elem_df, col = ["id", "nodes"]
     #
-    #   Output:     Dataframe node_df, col = ["id", "nodes"]
-    #               Dataframe elem_df, col = ["id", "nodes"]
+    #   Output:     Reordered dataframe node_df, col = ["id", "nodes"]
+    #               Reordered dataframe elem_df, col = ["id", "nodes"]
     # ----------------------------------------
     node_info_columns = ["id", "x", "y", "z"]
     elem_info_columns = ["id", "nodes"]
@@ -285,3 +294,102 @@ def reordering(node_df,elem_df):
         new_elem_df = new_elem_df.append(dict(zip(elem_df.columns, [elem_id, vec])), ignore_index=True)
     print("finish reordering")
     return new_node_df,new_elem_df
+
+
+def kPacking(num_layers,thick,node_df,elem_df,elemgrain_df,grain_df):
+    # ----------------------------------------
+    #   Description:
+    #       Make 3d mesh based on 2d mesh info
+    #
+    #   Input:      num_layer: Number of Meshes layers
+    #               thick: thickness of one layer
+    #               Reordered dataframe node_df, col = ["id", "x", "y", "z"]
+    #               Reordered dataframe elem_df, col = ["id", "nodes"]
+    #               Dataframe elemgrain_df, col = ["elementid", "grainid"]
+    #               Dataframe grain_df, col = ["id", "elements"]
+    #
+    #   Output:     [0] : Dataframe node3d_df, col = ["id", "x", "y", "z"]
+    #               [1] : Dataframe elem3d_df, col = ["id", "nodes"]
+    #               [2] : Dataframe elemgrain3d_df, col = ["elementid", "grainid"]
+    #               [3] : Dataframe grain3d_df, col = ["id", "elements"]
+    # ----------------------------------------
+    #define columns
+    node_info_columns = ["id", "x", "y", "z"]
+    elem_info_columns = ["id", "nodes"]
+    elemgrain_df_info_columns = ["elementid", "grainid"]
+    grain_info_columns = ["id", "elements"]
+
+    # make dataframe for 2d node and element
+    node2d_df = pd.DataFrame(columns=node_info_columns)
+    elem2d_df = pd.DataFrame(columns=elem_info_columns)
+
+    # store data into node2d_df and elem2d_df
+    node2d_df = node_df.drop(node_df[node_df['z'] != '0'].index)
+    for i in range(len(elem_df)):
+        vec = []
+        for node in elem_df.iloc[i]['nodes']:
+            node = int(node)
+            node_id_list = [int(i) for i in node2d_df['id'].tolist()]
+            if node in node_id_list:
+                vec.append(node)
+        elem2d_df = elem2d_df.append(dict(zip(elem2d_df.columns, [i + 1, vec])),
+                                     ignore_index=True)
+
+    # make dataframe for 3d node, element, grain
+    elem3d_df = pd.DataFrame(columns=elem_info_columns)
+    grain3d_df = pd.DataFrame(columns=grain_info_columns)
+    # the first layer node and the grain not change
+    node3d_df = node2d_df
+    elemgrain3d_df = elemgrain_df
+
+    # useful parameter
+    elem_num = len(elem_df)
+    node2d_num = len(node2d_df)
+
+    # store data into node3d_df, elem3d_df, elemgrain3d_df, grain3d_df
+    print("begin to pack 3d meshes.")
+    for i in range(len(grain_df)):
+        grain_id = int(grain_df.iloc[i]['id'])
+        elem_list = [int(elem) for elem in grain_df.iloc[i]['elements']]
+        elem_vec = []
+
+        for ii in elem_list:
+            top_elem_id = ii
+            elem = ii
+
+            top_nodes_list = [int(node) for node in elem2d_df.iloc[ii - 1]['nodes']]
+
+            for iii in range(num_layers):
+                upper_nodes_vec = []
+                lower_nodes_vec = []
+                elem = elem + iii * elem_num
+                elem_vec.append(elem)
+
+                for j in top_nodes_list:
+                    top_node_id = j
+                    upper_node_id = j + node2d_num * iii
+                    lower_node_id = j + node2d_num * (iii + 1)
+                    upper_nodes_vec.append(upper_node_id)
+                    lower_nodes_vec.append(lower_node_id)
+
+                    if lower_node_id not in node3d_df['id'].tolist():
+                        # top node coor
+                        top_node_x = node2d_df.iloc[top_node_id - 1]['x']
+                        top_node_y = node2d_df.iloc[top_node_id - 1]['y']
+                        top_node_z = 0.0
+
+                        # lower node coor
+                        lower_node_z = top_node_z + thick * (iii + 1)
+
+                        node3d_df = node3d_df.append(dict(zip(node_df.columns,
+                                                              [lower_node_id, top_node_x, top_node_y, lower_node_z])),
+                                                     ignore_index=True)
+
+                nodes_vec = upper_nodes_vec + lower_nodes_vec
+                elem3d_df = elem3d_df.append(dict(zip(elem_df.columns, [elem, nodes_vec])), ignore_index=True)
+                elemgrain3d_df = elemgrain3d_df.append(dict(zip(elemgrain_df.columns, [elem, grain_id])),
+                                                       ignore_index=True)
+
+        grain3d_df = grain3d_df.append(dict(zip(grain_df.columns, [grain_id, elem_vec])), ignore_index=True)
+        print("finish packing 3d meshes.")
+    return node3d_df,elem3d_df,elemgrain3d_df,grain3d_df
