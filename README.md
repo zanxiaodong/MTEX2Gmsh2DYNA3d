@@ -2,6 +2,11 @@
 ### Author:
 CHEN Jiawei, Master student in Mechanical Engineering, The University of Tokyo.
 
+### Functions lib:
+Here is two function libs in this repo:
+1. [inp2k](https://github.com/MaynotbeGarychan/MTEX2Gmsh2DYNA3d/blob/main/inp2k.py)
+2. [eulerangle](https://github.com/MaynotbeGarychan/MTEX2Gmsh2DYNA3d/blob/main/eulerangle.py)
+
 ### Short Description:
 When you use CPFEM (Crystal plasticity finite element method)
 to do simulation, you want to compare with experiment result.
