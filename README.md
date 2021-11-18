@@ -14,7 +14,7 @@ In order to use my functions, you have to install these in your environment:
 2. [Gmsh](http://gmsh.info/)
 3. [MTEX2Gmsh](https://github.com/DorianDepriester/MTEX2Gmsh) 
 ### How it works:
-####1. 
+#### 1. 
 Measure your specimen using EBSD machine and input them into MATALB MTEX:
 ```buildoutcfg
 import_wizard('EBSD')
@@ -27,7 +27,7 @@ mtexdata twins
 ```
 Here is the figure of a very simple EBSD result:
 ![](https://github.com/MaynotbeGarychan/MTEX2Gmsh2DYNA3d/blob/main/fig/ebsdmtex.JPG)
-####2.
+#### 2.
 Process your data via [MTEX](https://github.com/DorianDepriester/MTEX2Gmsh)  and make 2d Mesh(.inp) via [MTEX2Gmsh](https://github.com/DorianDepriester/MTEX2Gmsh) , see 
 [MATLAB code](https://github.com/MaynotbeGarychan/MTEX2Gmsh2DYNA3d/blob/main/ebsd2inp.m)
  here:
@@ -54,7 +54,7 @@ to make 2d mesh via MATLAB code,
 you can see [here](https://doriandepriester.github.io/MTEX2Gmsh/html/index.html).
 They provide a good documentation.
 
-####3. 
+#### 3. 
 Make 3d mesh by using my functions, 
 see a simple example in
 [code](https://github.com/MaynotbeGarychan/MTEX2Gmsh2DYNA3d/blob/main/example.py).
