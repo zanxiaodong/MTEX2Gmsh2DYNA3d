@@ -1,6 +1,6 @@
 # MTEX2Gmsh2DYNA3d
 ### Author:
-CHEN Jiawei, Master student in Mechnical Engineering, Materials Forming and Processing Lab, 
+CHEN Jiawei, Master student in Mechanical Engineering, Materials Forming and Processing Lab, 
 Institute of Industrial Science, The University of Tokyo.
 
 ### Short Description:
@@ -74,7 +74,7 @@ see a simple example in
 Import the function library of our codes, 
 [inp2k](https://github.com/MaynotbeGarychan/MTEX2Gmsh2DYNA3d/blob/main/inp2k.py)
 for meshing and [eulerangle](https://github.com/MaynotbeGarychan/MTEX2Gmsh2DYNA3d/blob/main/eulerangle.py)
-for process the euler angle by MTEX2Gmsh
+for process the euler angle
 :
 ```buildoutcfg
 import eulerangle
