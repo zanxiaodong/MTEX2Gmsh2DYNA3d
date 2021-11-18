@@ -1,10 +1,13 @@
+import pandas as pd
+import csv
+import sys
 
 """
 Input dir
     Please specify it every time
 """
-inp_dir = r"./du.inp"
-euler_dir = r'./du_euler.csv'
+inp_dir = r"./test.inp"
+euler_dir = r'./euler.csv'
 
 """
 Output dir
@@ -148,6 +151,7 @@ print(f"successfully reading this file, with {grain_num} grains, {elem_num} elem
 if grain_num_ebsd!=grain_num:
     sys.exit("grain num is not match in .csv and .inp")
 
+
 """
 Write .k grain
     grain_info_columns = ["id", "elements"]
@@ -230,3 +234,88 @@ with open(euler_angle_dir, 'w',newline='') as csvfile:
         print(f'Writing euler angle {euler_df.iloc[i]}')
 
     csvfile.close()
+
+
+
+# make 2d node2d_df,elem2d_df
+node2d_df = pd.DataFrame(columns = node_info_columns)
+#node2d_df = node_df.drop(node_df[node_df['z']=='1'].index)
+elem2d_df = pd.DataFrame(columns= elem_info_columns)
+node2d_num = len(node2d_df)*2
+for i in range(elem_num):
+    #print(elem_df.iloc[i]['nodes'])
+    vec = []
+    for node in elem_df.iloc[i]['nodes']:
+        node = int(node)
+        node_id_list = [int(i) for i in node2d_df['id'].tolist()]
+        if node in node_id_list:
+            vec.append(node)
+    elem2d_df = elem2d_df.append(dict(zip(elem2d_df.columns, [i+1, vec])),
+                                 ignore_index=True)
+
+
+
+
+#make new df to store value
+node3d_df = pd.DataFrame(columns = node_info_columns)
+node3d_df = node2d_df
+elem3d_df = pd.DataFrame(columns= elem_info_columns)
+grain3d_df = pd.DataFrame(columns= grain_info_columns)
+elemgrain3d_df = pd.DataFrame(columns= elemgrain_df_info_columns)
+elemgrain3d_df = elemgrain_df
+
+
+
+num_layers = 5
+thick = 0.2
+# node from vertical, element from vertical
+for i in range(grain_num):
+    grain_id= i+1
+    elem_list = grain_df.iloc[i]['elements']
+    elem_vec = []
+
+    for ii in elem_list:
+        upper_elem = int(ii)
+        elem = int(ii)
+        top_nodes_list = elem2d_df.iloc[elem-1]['nodes']
+        #print(upper_nodes_list)
+
+        for iii in range(num_layers):
+
+            upper_nodes_vec = []
+            lower_nodes_vec = []
+            elem = elem + iii*elem_num
+            for j in top_nodes_list:
+                top_node_id = int(j)
+                upper_node_id = int(int(j)+node2d_num*iii)
+                lower_node_id = int(int(j)+node2d_num*(iii+1))
+                upper_nodes_vec.append(upper_node_id)
+                lower_nodes_vec.append(lower_node_id)
+                nodes_vec = upper_nodes_vec+lower_nodes_vec
+
+                # top node coor
+                node_line = node_df.loc[node_df['id'] == str(top_node_id)]
+
+                top_node_x = node_line.iloc[0]['x']
+                top_node_y = node_line.iloc[0]['y']
+                top_node_z = node_line.iloc[0]['z']
+
+                # lower node coor
+                lower_node_z = float(top_node_z) + thick*(iii+1)
+
+                node3d_df = node3d_df.append(dict(zip(node_df.columns,
+                    [lower_node_id, top_node_x, top_node_y, lower_node_z])),ignore_index=True)
+
+            elem_vec.append(elem)
+
+            elem3d_df = elem3d_df.append(dict(zip(elem_df.columns, [elem, nodes_vec])),ignore_index=True)
+            elemgrain3d_df = elemgrain3d_df.append(dict(zip(elemgrain_df.columns, [elem, grain_id])), ignore_index=True)
+    grain3d_df = grain3d_df.append(dict(zip(grain_df.columns, [grain_id, elem_vec])), ignore_index=True)
+
+#print(grain3d_df)
+#print(elem3d_df)
+#print(node3d_df)
+
+import inp2k
+inp2k.write_mesh(node3d_df,elem3d_df, grain3d_df, euler_df, elemgrain3d_df)
+

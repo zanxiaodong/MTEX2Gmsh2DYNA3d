@@ -210,7 +210,11 @@ def write_mesh(node_df,elem_df,grain_df,euler_df,elemgrain_df):
         for i in range(elem_num):
             print(f"writing {elem_df.iloc[i]['id']} elem info into .k")
             k.write(f"{elem_df.iloc[i]['id']}".rjust(8))
-            k.write(f"{elemgrain_df.iloc[i]['grainid']}".rjust(8))
+
+            pos = elemgrain_df[elemgrain_df.elementid == elem_df.iloc[i]['id']].index.tolist()[0]
+            print(pos)
+            k.write(f"{elemgrain_df.iloc[pos]['grainid']}".rjust(8))
+
             for nodeid in range(len(elem_df.iloc[i]['nodes'])):
                 k.write(f"{elem_df.iloc[i]['nodes'][nodeid]}".rjust(8))
             k.write('\n')
@@ -240,4 +244,44 @@ def write_mesh(node_df,elem_df,grain_df,euler_df,elemgrain_df):
             k.write('\n')
         k.close()
 
-
+def reordering(node_df,elem_df):
+    # ----------------------------------------
+    #   Description:
+    #       reordering node id by its z,x,y coordinate,
+    #       replace the new node id to elem_df
+    #
+    #   Input:      Dataframe node_df, col = ["id", "nodes"]
+    #               Dataframe elem_df, col = ["id", "nodes"]
+    #
+    #   Output:     Dataframe node_df, col = ["id", "nodes"]
+    #               Dataframe elem_df, col = ["id", "nodes"]
+    # ----------------------------------------
+    node_info_columns = ["id", "x", "y", "z"]
+    elem_info_columns = ["id", "nodes"]
+    # reordering the node2d
+    node_oldid_list = []  # index: newid-1 value: oldid
+    node_df_ro = node_df
+    node_df_ro.sort_values(by=["z", "x", "y"], inplace=True)
+    # make new dataframe with reordering node id
+    new_node_df = pd.DataFrame(columns=node_info_columns)
+    print("reordering node dataframe")
+    for i in range(len(node_df)):
+        xcoor = node_df_ro.iloc[i]["x"]
+        ycoor = node_df_ro.iloc[i]["y"]
+        zcoor = node_df_ro.iloc[i]["z"]
+        node_oldid_list.append(int(node_df_ro.iloc[i]["id"]))
+        new_node_df = new_node_df.append(dict(zip(node_info_columns, [i + 1, xcoor, ycoor, zcoor])), ignore_index=True)
+    # replace the old node id with new node id
+    print("reordering element dataframe")
+    new_elem_df = pd.DataFrame(columns=elem_info_columns)
+    for i in range(len(elem_df)):
+        elem_id = elem_df.iloc[i]["id"]
+        old_node_list = elem_df.iloc[i]["nodes"]
+        vec = []
+        for ii in old_node_list:
+            old_node_id = int(ii)
+            new_node_id = node_oldid_list.index(old_node_id)+1
+            vec.append(new_node_id)
+        new_elem_df = new_elem_df.append(dict(zip(elem_df.columns, [elem_id, vec])), ignore_index=True)
+    print("finish reordering")
+    return new_node_df,new_elem_df

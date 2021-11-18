@@ -10,5 +10,5 @@ ebsd = ebsd(inpolygon(ebsd,poly));
 
 grains=calcGrains(ebsd('indexed'));
 G=gmshGeo(grains);
-mesh(G,'test.inp','ElementType','HexOnly','ElementSize',0.1);
+mesh(G,'test.inp','ElementType','HexOnly','ElementSize',1);
 exportGrainProps(G,'euler.csv');
