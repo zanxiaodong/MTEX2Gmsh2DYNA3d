@@ -1,7 +1,6 @@
 # MTEX2Gmsh2DYNA3d
 ### Author:
-CHEN Jiawei, Master student in Mechanical Engineering, Materials Forming and Processing Lab, 
-Institute of Industrial Science, The University of Tokyo.
+CHEN Jiawei, Master student in Mechanical Engineering, The University of Tokyo.
 
 ### Short Description:
 When you use CPFEM (Crystal plasticity finite element method)
