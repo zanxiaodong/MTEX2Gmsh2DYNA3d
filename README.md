@@ -1,13 +1,25 @@
 # MTEX2Gmsh2DYNA3d
 ### Author:
-        CHEN Jiawei, Master student in Mechnical Engineering,
-        Materials Forming and Processing Lab, 
-        Institute of Industrial Science,
-        The University of Tokyo.
+CHEN Jiawei, Master student in Mechnical Engineering, Materials Forming and Processing Lab, 
+Institute of Industrial Science, The University of Tokyo.
+
 ### Short Description:
+When you use CPFEM (Crystal plasticity finite element method)
+to do simulation, you want to compare with experiment result.
+This repo provides and instruct you how to make 3d polycrystal 
+mesh from EBSD result (.ang, .ori, .ctf, etc.), to better simulate
+the real specimen with grains of specific angles. 
+This repo can do these now:
 1. Converting meshing from .inp(Abaqus) to .k(DYNA).
 2. Writing 3d polycrystal mesh based on 2d polycrystal mesh
 3. Making .csv for input euler angle of UMAT.
+
+In the future, we want to:
+1. make 3d mesh directly from 3D EBSD machine.
+
+Here we provide a very simple example to reduce the computation time, but 
+this instruction and repo also works in complicated meshes.
+
 ### Dependencies:
 In order to use my functions, you have to install these in your environment:
 1. [MTEX](https://mtex-toolbox.github.io/)
