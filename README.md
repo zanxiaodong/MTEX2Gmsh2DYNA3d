@@ -1,10 +1,10 @@
 # MTEX2Gmsh2DYNA3d
-###Author:
+### Author:
         CHEN Jiawei, Master student in Mechnical Engineering,
         Materials Forming and Processing Lab, 
         Institute of Industrial Science,
         The University of Tokyo.
-###Short Description:
+### Short Description:
 1. Converting meshing from .inp(Abaqus) to .k(DYNA).
 2. Writing 3d polycrystal mesh based on 2d polycrystal mesh
 3. Making .csv for input euler angle of UMAT.
