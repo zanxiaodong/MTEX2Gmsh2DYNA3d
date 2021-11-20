@@ -148,7 +148,7 @@ def read_elemgrain(grain_df):
 
 
 
-def write_mesh(node_df,elem_df,grain_df,euler_df,elemgrain_df):
+def write_mesh(kfile_dir,node_df,elem_df,grain_df,euler_df,elemgrain_df):
     # ----------------------------------------
     #   Description:
     #       write the mesh info in .k file
@@ -160,8 +160,6 @@ def write_mesh(node_df,elem_df,grain_df,euler_df,elemgrain_df):
     #               Dataframe elemgrain_df, col = ["elementid","grainid"]
     #   Output:     .k file for dyna
     # ----------------------------------------
-
-    kfile_dir = r'./polymesh.k'
     """
     Reading .inp Review
     """
@@ -178,6 +176,7 @@ def write_mesh(node_df,elem_df,grain_df,euler_df,elemgrain_df):
     Write .k grain
         grain_info_columns = ["id", "elements"]
     """
+    #kfile_dir = r'./polymeshes.k'
     print("writing grain info into .k")
     with open(kfile_dir, 'w') as k:
         for i in range(len(grain_df)):
@@ -391,5 +390,5 @@ def kPacking(num_layers,thick,node_df,elem_df,elemgrain_df,grain_df):
                                                        ignore_index=True)
 
         grain3d_df = grain3d_df.append(dict(zip(grain_df.columns, [grain_id, elem_vec])), ignore_index=True)
-        print("finish packing 3d meshes.")
+    print("finish packing 3d meshes.")
     return node3d_df,elem3d_df,elemgrain3d_df,grain3d_df
